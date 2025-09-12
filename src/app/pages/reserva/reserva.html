@@ -1,0 +1,120 @@
+<p-toolbar styleClass="mb-4">
+            <ng-template #start>
+                <div class="flex gap-2 items-center">
+                    <p-select [(ngModel)]="hotelId" [options]="hotelesOptions" optionLabel="label" optionValue="value" placeholder="Selecciona hotel" (onChange)="onHotelChange()" styleClass="w-20rem" />
+                    <p-button label="Nueva reserva" icon="pi pi-plus" [disabled]="!hotelId" (onClick)="openNew()" />
+                </div>
+            </ng-template>
+            <ng-template #end>
+                <p-iconfield>
+                    <p-inputicon styleClass="pi pi-search" />
+                    <input pInputText type="text" (input)="onGlobalFilter(dt, $event)" placeholder="Buscar..." />
+                </p-iconfield>
+            </ng-template>
+        </p-toolbar>
+
+        <p-table #dt [value]="rows()" [paginator]="true" [rows]="10" [rowHover]="true" [rowsPerPageOptions]="[10, 20, 30]" dataKey="id" [showCurrentPageReport]="true" currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} reservas">
+            <ng-template #header>
+                <tr>
+                    <th>Habitación</th>
+                    <th>Cliente</th>
+                    <th>Entrada</th>
+                    <th>Salida</th>
+                    <th>Huéspedes</th>
+                    <th>Estado</th>
+                    <th>Total</th>
+                    <th style="width: 14rem"></th>
+                </tr>
+            </ng-template>
+
+            <ng-template #body let-r>
+                <tr>
+                    <td>{{ mapHabitacion(r.habitacionId) }}</td>
+                    <td>{{ mapCliente(r.clienteId) }}</td>
+                    <td>{{ r.entrada }}</td>
+                    <td>{{ r.salida }}</td>
+                    <td>{{ r.huespedes }}</td>
+                    <td><p-tag [value]="r.estado" [severity]="estadoSeverity(r.estado)"></p-tag></td>
+                    <td>{{ r.total | currency: 'GTQ' }}</td>
+                    <td class="text-right">
+                        <p-button icon="pi pi-sign-in" label="Check-in" size="small" class="mr-2" [disabled]="r.estado !== 'RESERVADA'" (click)="doCheckin(r)" />
+                        <p-button icon="pi pi-sign-out" label="Check-out" size="small" class="mr-2" [disabled]="r.estado !== 'CHECKED_IN'" (click)="doCheckout(r)" />
+                        <p-button icon="pi pi-times" label="Cancelar" size="small" severity="danger" [disabled]="r.estado !== 'RESERVADA'" (click)="doCancelar(r)" />
+                        <p-button icon="pi pi-file" label="Emitir factura" size="small" class="mr-2"
+          [disabled]="r.estado!=='CHECKED_OUT'"
+          (click)="openFacturaDialog(r)" />
+                    </td>
+                </tr>
+            </ng-template>
+        </p-table>
+
+        <p-dialog [(visible)]="dialogVisible" [modal]="true" [style]="{ width: '680px' }" header="Nueva reserva">
+            <ng-template #content>
+                <div class="grid grid-cols-12 gap-4">
+                    <div class="col-span-12 md:col-span-4">
+                        <label class="block font-bold mb-2">Hotel</label>
+                        <p-select [(ngModel)]="buffer.hotelId" [options]="hotelesOptions" optionLabel="label" optionValue="value" placeholder="Selecciona hotel" (onChange)="cargarHabitaciones()" styleClass="w-full" />
+                    </div>
+
+                    <div class="col-span-12 md:col-span-4">
+                        <label class="block font-bold mb-2">Habitación</label>
+                        <p-select [(ngModel)]="buffer.habitacionId" [options]="habitacionesOptions" optionLabel="label" optionValue="value" placeholder="Selecciona habitación" styleClass="w-full" />
+                    </div>
+
+                    <div class="col-span-12 md:col-span-4">
+                        <label class="block font-bold mb-2">Cliente</label>
+                        <p-select [(ngModel)]="buffer.clienteId" [options]="clientesOptions" optionLabel="label" optionValue="value" placeholder="Selecciona cliente" styleClass="w-full" />
+                    </div>
+
+                    <div class="col-span-12 md:col-span-4">
+                        <label class="block font-bold mb-2">Entrada</label>
+                        <input type="date" pInputText [(ngModel)]="buffer.entrada" class="w-full" />
+                    </div>
+                    <div class="col-span-12 md:col-span-4">
+                        <label class="block font-bold mb-2">Salida</label>
+                        <input type="date" pInputText [(ngModel)]="buffer.salida" class="w-full" />
+                    </div>
+                    <div class="col-span-12 md:col-span-4">
+                        <label class="block font-bold mb-2">Huéspedes</label>
+                        <p-inputNumber [(ngModel)]="buffer.huespedes" [min]="1"></p-inputNumber>
+                    </div>
+                </div>
+            </ng-template>
+            <ng-template #footer>
+                <p-button label="Cancelar" icon="pi pi-times" text (click)="hideDialog()" />
+                <p-button label="Guardar" icon="pi pi-check" (click)="save()" />
+            </ng-template>
+        </p-dialog>
+
+        <p-confirmDialog />
+        <p-toast />
+
+        <p-dialog [(visible)]="invoiceVisible" [modal]="true" [style]="{width:'560px'}" header="Emitir factura">
+  <ng-template #content>
+    <div class="grid grid-cols-12 gap-4">
+      <div class="col-span-12 md:col-span-6">
+        <label class="block font-bold mb-2">Moneda</label>
+        <p-select [(ngModel)]="invoice.moneda" [options]="monedas" optionLabel="label" optionValue="value"
+                  placeholder="Seleccione" styleClass="w-full" />
+      </div>
+      <div class="col-span-12 md:col-span-6">
+        <label class="block font-bold mb-2">Serie</label>
+        <p-select [(ngModel)]="invoice.serie" [options]="series" optionLabel="label" optionValue="value"
+                  placeholder="Seleccione" styleClass="w-full" />
+      </div>
+      <div class="col-span-12 md:col-span-6">
+        <label class="block font-bold mb-2">NIT</label>
+        <input pInputText [(ngModel)]="invoice.clienteNit" placeholder="CF o NIT" />
+        <small class="text-red-500" *ngIf="invoice.clienteNit && !nitRegex.test(invoice.clienteNit)">NIT inválido.</small>
+      </div>
+      <div class="col-span-12 md:col-span-6">
+        <label class="block font-bold mb-2">Nombre</label>
+        <input pInputText [(ngModel)]="invoice.clienteNombre" placeholder="Nombre en factura" />
+      </div>
+    </div>
+  </ng-template>
+  <ng-template #footer>
+    <p-button label="Cancelar" icon="pi pi-times" text (click)="invoiceVisible=false" />
+    <p-button label="Emitir" icon="pi pi-check" (click)="emitirFactura()" />
+  </ng-template>
+</p-dialog>

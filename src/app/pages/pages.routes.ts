@@ -1,0 +1,27 @@
+import { Routes } from '@angular/router';
+import { Documentation } from './documentation/documentation';
+import { Crud } from './crud/crud';
+import { Empty } from './empty/empty';
+import { HotelesCrudComponent } from './hotel/hotel';
+import { HabitacionesCrudComponent } from './habitacion/habitacion';
+import { ReservasCrudComponent } from './reserva/reserva';
+import { FacturasHotelComponent } from './factura-hotel/factura-hotel';
+import { RestaurantesCrudComponent } from './restaurante/restaurante/restaurante';
+import { PlatillosCrudComponent } from './restaurante/platillo-crud/platillo-crud';
+import { CuentasCrudComponent } from './restaurante/cuentas-crud/cuentas-crud';
+import { FacturasRestComponent } from './restaurante/facturas-res/facturas-res';
+
+export default [
+    { path: 'documentation', component: Documentation },
+    { path: 'crud', component: Crud },
+    { path: 'empty', component: Empty },
+    { path: 'hotel', component: HotelesCrudComponent },
+    { path: 'habitacion', component: HabitacionesCrudComponent },
+    { path: 'reserva', component: ReservasCrudComponent },
+    { path: 'facturas', component: FacturasHotelComponent },
+    { path: 'restaurantes', component: RestaurantesCrudComponent },
+     { path: 'restaurantes/platillos', component: PlatillosCrudComponent },
+     { path: 'restaurantes/cuenta', component: CuentasCrudComponent },
+      { path: 'restaurantes/facturas-rest', component: FacturasRestComponent },
+    { path: '**', redirectTo: '/notfound' }
+] as Routes;
