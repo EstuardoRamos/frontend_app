@@ -10,6 +10,10 @@ import { RestaurantesCrudComponent } from './restaurante/restaurante/restaurante
 import { PlatillosCrudComponent } from './restaurante/platillo-crud/platillo-crud';
 import { CuentasCrudComponent } from './restaurante/cuentas-crud/cuentas-crud';
 import { FacturasRestComponent } from './restaurante/facturas-res/facturas-res';
+import { RegisterComponent } from './auth/register/register';
+//import { ReviewPlatilloComponent } from './reviews/review-platillo/review-platillo';
+import { ReviewHotelComponent } from './reviews/review-hotel/review-hotel';
+import { ReviewsPlatillosPorCuentaComponent } from './reviews/review-platillo/review-platillo';
 
 export default [
     { path: 'documentation', component: Documentation },
@@ -20,8 +24,11 @@ export default [
     { path: 'reserva', component: ReservasCrudComponent },
     { path: 'facturas', component: FacturasHotelComponent },
     { path: 'restaurantes', component: RestaurantesCrudComponent },
-     { path: 'restaurantes/platillos', component: PlatillosCrudComponent },
-     { path: 'restaurantes/cuenta', component: CuentasCrudComponent },
-      { path: 'restaurantes/facturas-rest', component: FacturasRestComponent },
+    { path: 'restaurantes/platillos', component: PlatillosCrudComponent },
+    { path: 'restaurantes/cuenta', component: CuentasCrudComponent },
+    { path: 'restaurantes/facturas-rest', component: FacturasRestComponent },
+    { path: 'register', component: RegisterComponent },
+    { path: 'review-platillo', component: ReviewsPlatillosPorCuentaComponent },
+    { path: 'review-hotel', component: ReviewHotelComponent },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
