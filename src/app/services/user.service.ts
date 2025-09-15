@@ -2,6 +2,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '@/enviroments/enviroment';
 
 export interface UserDTO {
     id: string;
@@ -13,7 +14,7 @@ export interface UserDTO {
     createdAt: string;
 }
 
-const BASE = 'http://localhost:8085/v1/users';
+const BASE = environment.api.user+'/v1/users';
 
 @Injectable({ providedIn: 'root' })
 export class UsersService {

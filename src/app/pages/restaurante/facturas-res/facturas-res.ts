@@ -18,6 +18,10 @@ import { RestaurantesService } from '@/services/restaurante';
 import { FacturaRestDTO } from '@/interfaces/factura-rest.model';
 import { RestauranteDTO } from '@/interfaces/restaurante.model';
 
+// PDF
+import jsPDF from 'jspdf';
+import autoTable, { RowInput } from 'jspdf-autotable';
+
 @Component({
   selector: 'app-facturas-rest',
   standalone: true,
@@ -58,7 +62,7 @@ import { RestauranteDTO } from '@/interfaces/restaurante.model';
         <th class="text-right">Total</th>
         <th>Fecha</th>
         <th>Estado</th>
-        <th style="width: 10rem"></th>
+        <th style="width: 12rem"></th>
       </tr>
     </ng-template>
     <ng-template #body let-f>
@@ -72,21 +76,40 @@ import { RestauranteDTO } from '@/interfaces/restaurante.model';
         <td>{{ f.createdAt | date:'short' }}</td>
         <td><p-tag [value]="f.estado" [severity]="f.estado==='EMITIDA' ? 'success':'danger'"></p-tag></td>
         <td class="text-right">
-          <p-button icon="pi pi-eye" [rounded]="true" [outlined]="true" class="mr-2" (click)="ver(f)" />
-          <p-button icon="pi pi-ban" severity="danger" [rounded]="true" [outlined]="true"
+          <p-button label="Ver" icon="pi pi-eye" [outlined]="true" class="mr-2" (click)="ver(f)" />
+          <p-button label="Anular" icon="pi pi-ban" severity="danger" [outlined]="true"
                     [disabled]="f.estado!=='EMITIDA'" (click)="anular(f)" />
         </td>
       </tr>
     </ng-template>
   </p-table>
 
-  <p-dialog [(visible)]="detailVisible" [modal]="true" [style]="{width:'720px'}" header="Factura">
+  <p-dialog [(visible)]="detailVisible" [modal]="true" [style]="{width:'760px'}" header="Factura">
     <ng-template #content>
-      <div class="mb-2">Serie {{ sel?.serie }} - {{ sel?.numero }} | {{ sel?.moneda }}</div>
-      <div class="text-sm opacity-80 mb-3">Creada: {{ sel?.createdAt | date:'short' }}</div>
-      <p-table [value]="sel?.items || []">
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <div class="font-semibold">Serie {{ sel?.serie }} - {{ sel?.numero }} | {{ sel?.moneda }}</div>
+          <div class="text-sm opacity-80">Creada: {{ sel?.createdAt | date:'short' }}</div>
+        </div>
+        <p-button icon="pi pi-file-pdf" label="Descargar PDF" severity="help" (onClick)="exportAsPdf()" />
+      </div>
+
+      <div class="mt-3 p-3 border rounded-lg bg-surface-50">
+        <div class="text-sm opacity-80">Cuenta ID</div>
+        <div class="font-mono text-sm break-all">{{ sel?.cuentaId }}</div>
+        <div class="mt-1 text-xs opacity-70">
+          <b>Código para valorar tu platillo:</b> usa este <i>Cuenta ID</i> en la sección de reseñas para calificar tus platillos.
+        </div>
+      </div>
+
+      <p-table class="mt-3" [value]="sel?.items || []">
         <ng-template #header>
-          <tr><th>Nombre</th><th class="text-right">P.Unit</th><th class="text-right">Cant.</th><th class="text-right">Subt.</th></tr>
+          <tr>
+            <th>Nombre</th>
+            <th class="text-right">P.Unit</th>
+            <th class="text-right">Cant.</th>
+            <th class="text-right">Subt.</th>
+          </tr>
         </ng-template>
         <ng-template #body let-i>
           <tr>
@@ -97,6 +120,7 @@ import { RestauranteDTO } from '@/interfaces/restaurante.model';
           </tr>
         </ng-template>
       </p-table>
+
       <div class="mt-3 text-right space-y-1">
         <div>Subtotal: <b>{{ sel?.subtotal | number:'1.2-2' }}</b></div>
         <div class="text-lg">Total: <b>{{ sel?.total | number:'1.2-2' }}</b></div>
@@ -161,6 +185,62 @@ export class FacturasRestComponent implements OnInit {
         });
       }
     });
+  }
+
+  exportAsPdf() {
+    if (!this.sel) return;
+    const f = this.sel;
+
+    const doc = new jsPDF({ unit: 'pt', format: 'a4' });
+    const left = 40;
+    let y = 40;
+
+    // Encabezado
+    doc.setFontSize(16);
+    doc.text(`Factura Restaurante`, left, y); y += 18;
+    doc.setFontSize(11);
+    doc.text(`Serie: ${f.serie}  |  No.: ${f.numero}`, left, y); y += 14;
+    doc.text(`Moneda: ${f.moneda}  |  Fecha: ${new Date(f.createdAt).toLocaleString()}`, left, y); y += 22;
+
+    // CuentaId (código para review)
+    doc.setFontSize(10);
+    doc.text(`Cuenta ID (código para valorar platillos):`, left, y); y += 12;
+    doc.setFont('courier', 'normal').setFontSize(10);
+    doc.text(f.cuentaId, left, y); y += 18;
+    doc.setFont('helvetica', 'normal');
+
+    // Tabla de items
+    const head = [['Nombre', 'P.Unit', 'Cant.', 'Subt.']];
+    const body: RowInput[] = (f.items || []).map(i => [
+      i.nombre,
+      (i.precioUnitario ?? 0).toFixed(2),
+      String(i.cantidad ?? 0),
+      (i.subtotal ?? 0).toFixed(2)
+    ]);
+    autoTable(doc, {
+      head, body,
+      startY: y,
+      styles: { fontSize: 10, halign: 'right' },
+      headStyles: { halign: 'left' },
+      columnStyles: {
+        0: { halign: 'left' }, // nombre
+      },
+      margin: { left, right: left }
+    });
+
+    const endY = (doc as any).lastAutoTable.finalY || y;
+
+    // Totales
+    doc.setFontSize(11);
+    doc.text(`Subtotal: ${f.subtotal.toFixed(2)}`, 400, endY + 24, { align: 'left' });
+    doc.setFontSize(12);
+    doc.text(`Total: ${f.total.toFixed(2)}`, 400, endY + 42, { align: 'left' });
+
+    // Pie
+    doc.setFontSize(9);
+    doc.text(`Gracias por su preferencia.`, left, endY + 60);
+
+    doc.save(`Factura_${f.serie}-${f.numero}.pdf`);
   }
 
   private normalizeRange(range: Date[] | null): [string|undefined, string|undefined] {

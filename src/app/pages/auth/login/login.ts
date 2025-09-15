@@ -11,6 +11,7 @@ import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { AuthService } from '@/services/auth.service';
 import { CommonModule } from '@angular/common';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-login',
@@ -36,26 +37,29 @@ export class LoginComponent {
   ) {}
 
   login() {
-    if (!this.email || !this.password) {
-      this.toast.add({ severity: 'warn', summary: 'Campos requeridos', detail: 'Ingresa email y contraseña' });
-      return;
-    }
+  if (!this.email || !this.password) {
+    this.toast.add({ severity: 'warn', summary: 'Campos requeridos', detail: 'Ingresa email y contraseña' });
+    return;
+  }
 
-    this.loading = true;
-    this.auth.loginAndLoadUser({ email: this.email, password: this.password }).subscribe({
+  this.loading = true;
+  this.auth.loginAndLoadUser({ email: this.email, password: this.password })
+    .pipe(finalize(() => this.loading = false))
+    .subscribe({
       next: (user) => {
-        console.log('Usuario autenticado:', user); // <-- aquí ves nombre/email/rol/etc
+        console.log('Usuario autenticado:', user);
         this.toast.add({ severity: 'success', summary: 'Bienvenido', detail: 'Inicio de sesión correcto' });
         this.router.navigateByUrl('/');
       },
       error: (err) => {
-        this.toast.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: err?.error?.message || 'Credenciales inválidas'
-        });
-      },
-      complete: () => (this.loading = false)
+        const detalle =
+          err?.error?.message ||
+          (err.status === 0 ? 'No se pudo conectar con el servidor' :
+           err.status === 400 ? 'Credenciales inválidas' :
+           err.statusText || 'Error desconocido');
+
+        this.toast.add({ severity: 'error', summary: 'Error de inicio de sesión', detail: detalle });
+      }
     });
-  }
+}
 }

@@ -18,11 +18,16 @@ import { PopularRestauranteComponent } from './reportes/popular-restaurante/popu
 import { PopularHabitacionComponent } from './reportes/popular-habitacion/popular-habitacion';
 import { IngresosRestauranteComponent } from './reportes/ingresos-restaurante/ingresos-restaurante';
 import { ReportesDashboardComponent } from './reportes/reportes-dashboard/reportes-dashboard';
+import { ReviewsPlatillosListComponent } from './reviews/reviews-platillo-list/reviews-platillo-list';
+import { ReviewsHotelCardsComponent } from './reviews/reviews-hotel-cards/reviews-hotel-cards';
+import { RegisterClientesComponent } from './auth/register-clientes/register-clientes';
 
 export default [
     { path: 'documentation', component: Documentation },
     { path: 'crud', component: Crud },
     { path: 'empty', component: Empty },
+
+    //mis funcionalidades son estas
     { path: 'hotel', component: HotelesCrudComponent },
     { path: 'habitacion', component: HabitacionesCrudComponent },
     { path: 'reserva', component: ReservasCrudComponent },
@@ -32,11 +37,14 @@ export default [
     { path: 'restaurantes/cuenta', component: CuentasCrudComponent },
     { path: 'restaurantes/facturas-rest', component: FacturasRestComponent },
     { path: 'register', component: RegisterComponent },
+    { path: 'register-clientes', component: RegisterClientesComponent },
     { path: 'review-platillo', component: ReviewsPlatillosPorCuentaComponent },
     { path: 'review-hotel', component: ReviewHotelComponent },
     { path: 'popular-rest', component: PopularRestauranteComponent },
     { path: 'popular-habitacion', component: PopularHabitacionComponent },
     { path: 'reportes', component: ReportesDashboardComponent },
     { path: 'ingresos-rest', component: IngresosRestauranteComponent },
+    { path: 'reviews-platillos', component: ReviewsPlatillosListComponent},
+    { path: 'reviews-hoteles', component: ReviewsHotelCardsComponent},
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;

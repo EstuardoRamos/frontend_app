@@ -3,8 +3,9 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, of, switchMap, tap, throwError, catchError } from 'rxjs';
 import { LoginDTO, LoginResponse, RegisterDTO, UserDTO } from '@/interfaces/user.model';
+import { environment } from '@/enviroments/enviroment';
 
-const BASE_URL = 'http://localhost:8085';
+const BASE_URL = environment.api.user;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -95,5 +96,22 @@ export class AuthService {
     handleError(err: HttpErrorResponse) {
         const msg = err?.error?.message || err.message || 'Error inesperado';
         return throwError(() => new Error(msg));
+    }
+
+    // src/app/services/auth.service.ts (añade estas helpers)
+    get roleFromToken(): 'ADMIN' | 'CLIENTE' | 'EMPLEADO_REST' | 'EMPLEADO_HOTEL' | null {
+        const t = this.token;
+        if (!t) return null;
+        try {
+            const payload = JSON.parse(atob(t.split('.')[1] || ''));
+            return payload?.rol ?? null;
+        } catch {
+            return null;
+        }
+    }
+
+    hasRole(...roles: string[]): boolean {
+        const r = this.roleFromToken;
+        return !!r && roles.includes(r);
     }
 }
