@@ -6,7 +6,7 @@ import { ReservaCreateDTO, ReservaDTO } from '@/interfaces/reserva.model';
 
 @Injectable({ providedIn: 'root' })
 export class ReservasService {
-  private base = environment.api.habitaciones + '/v1/reservas'; // según tu ejemplo, corre en 8082
+  private base = environment.api.hoteles + '/v1/reservas'; // según tu ejemplo, corre en 8082
 
   constructor(private http: HttpClient) {}
 

@@ -11,6 +11,7 @@ export interface HabitacionDTO {
   id: string;
   hotelId: string;
   numero: string;
+  nombre: string;
   tipo: string;
   capacidad: number;
   precioBase: number;

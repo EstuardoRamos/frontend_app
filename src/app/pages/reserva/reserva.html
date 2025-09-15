@@ -63,7 +63,8 @@
 
                     <div class="col-span-12 md:col-span-4">
                         <label class="block font-bold mb-2">Cliente</label>
-                        <p-select [(ngModel)]="buffer.clienteId" [options]="clientesOptions" optionLabel="label" optionValue="value" placeholder="Selecciona cliente" styleClass="w-full" />
+                        
+                        <input type="text" pInputText [(ngModel)]="buffer.clienteId" class="w-full" />
                     </div>
 
                     <div class="col-span-12 md:col-span-4">

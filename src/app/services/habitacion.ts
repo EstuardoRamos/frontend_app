@@ -6,7 +6,7 @@ import { HabitacionCreateDTO, HabitacionDTO, Page } from '@/interfaces/habitacio
 
 @Injectable({ providedIn: 'root' })
 export class HabitacionesService {
-  private base = environment.api.habitaciones + '/v1/habitaciones';
+  private base = environment.api.hoteles + '/v1/habitaciones';
 
   constructor(private http: HttpClient) {}
 

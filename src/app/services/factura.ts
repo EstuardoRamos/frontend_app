@@ -6,7 +6,7 @@ import { FacturaCreateDTO, FacturaDTO } from '@/interfaces/factura.model';
 
 @Injectable({ providedIn: 'root' })
 export class FacturasService {
-  private base = environment.api.habitaciones + '/v1/facturas'; // corre en 8082 según tu ejemplo
+  private base = environment.api.hoteles + '/v1/facturas'; // corre en 8082 según tu ejemplo
 
   constructor(private http: HttpClient) {}
 

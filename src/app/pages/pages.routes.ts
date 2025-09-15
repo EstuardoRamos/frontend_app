@@ -14,6 +14,10 @@ import { RegisterComponent } from './auth/register/register';
 //import { ReviewPlatilloComponent } from './reviews/review-platillo/review-platillo';
 import { ReviewHotelComponent } from './reviews/review-hotel/review-hotel';
 import { ReviewsPlatillosPorCuentaComponent } from './reviews/review-platillo/review-platillo';
+import { PopularRestauranteComponent } from './reportes/popular-restaurante/popular-restaurante';
+import { PopularHabitacionComponent } from './reportes/popular-habitacion/popular-habitacion';
+import { IngresosRestauranteComponent } from './reportes/ingresos-restaurante/ingresos-restaurante';
+import { ReportesDashboardComponent } from './reportes/reportes-dashboard/reportes-dashboard';
 
 export default [
     { path: 'documentation', component: Documentation },
@@ -30,5 +34,9 @@ export default [
     { path: 'register', component: RegisterComponent },
     { path: 'review-platillo', component: ReviewsPlatillosPorCuentaComponent },
     { path: 'review-hotel', component: ReviewHotelComponent },
+    { path: 'popular-rest', component: PopularRestauranteComponent },
+    { path: 'popular-habitacion', component: PopularHabitacionComponent },
+    { path: 'reportes', component: ReportesDashboardComponent },
+    { path: 'ingresos-rest', component: IngresosRestauranteComponent },
     { path: '**', redirectTo: '/notfound' }
 ] as Routes;
